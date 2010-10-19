@@ -1,0 +1,22 @@
+{{ published_at|date("m/d/Y") }}
+{{ string|format(foo, "bar") }}
+{% for i in 0..10 %}{{ ['odd', 'even']|cycle(i) }}{% endfor %}
+{% for i in 0..10 %}{{ fruits|cycle(i) }}{% endfor %}
+{{ "a0&‚ " | urlencode }}
+{{ "good case" | title }}
+{{ "good case" | capitalize }}
+{{ "good" | upper }}
+{{ "good" | lower }}
+{{ "good" | striptags }}
+{{ arrays |join('|') }}
+{{ arrays |join }}
+{{ arrays |reverse }}
+{{ arrays | length }}
+{{ fruits | sort }}
+{{ 1    |in([1, 2, 3]) }}
+{{ 'cd' |in('abcde') }}
+{% for i in 0|range(10) %}{{ i }}{% endfor %}
+{{ my_variable|default('my_variable is not defined') }}
+{% for key in map|keys %}{{key}}{% endfor %}
+{{ &<>'" | escape }}
+{{ &<>'" | e }}

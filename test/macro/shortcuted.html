@@ -1,0 +1,7 @@
+{% macro wrapped_input(name, value, type, size) %}
+{% import "imported_forms.html" as forms %}
+<div class="field">
+{{ forms.input(name, value, type, size) }}
+</div>
+{% endmacro %}
+{{ _self.wrapped_input('NAME','VALUE','TYPE',0) }}

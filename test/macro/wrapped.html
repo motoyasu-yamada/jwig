@@ -1,0 +1,10 @@
+{% macro input(name, value, type, size) %}
+<input type="{{ type|default('text') }}" name="{{ name }}" value="{{ value|e }}" size="{{ size|default(20) }}" />
+{% endmacro %}
+
+{% macro wrapped_input(name, value, type, size) %}
+<div class="field">
+{{ _self.input(name, value, type, size) }}
+</div>
+{% endmacro %}
+{{ _self.wrapped_input("Name","Value","Type",1024) }}

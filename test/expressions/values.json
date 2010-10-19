@@ -1,0 +1,7 @@
+{
+  "name": "Jwig",
+  "array": [ "Zero","One","Two"],
+  "map"  : { "Key0": "Value0","Key1": "Value1"},
+  "dot"  : { "property":"One", "accessor":"Two", "getter":"Three", "map":"Four" },
+  "nums" : [ 0, 1, 2, 3,4 ]
+}

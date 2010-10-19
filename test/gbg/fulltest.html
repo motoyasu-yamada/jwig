@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+{# $Revision: 424107 $ $Date: 2006-07-21 00:15:42 +0100 (Fri, 21 Jul 2006) $ #}
+<html lang="en">
+  <head>
+    <title>My Webpage</title>
+  </head>
+  <body>
+  	<div>
+  	<h2>For</h2>
+  	<h3>Normal</h3>
+  	<div>
+	{% for i in 3 .. 1 %}
+	<div>{{ i }}</div>
+	{% endfor %}
+	</div>
+
+  	<h3>Map</h3>
+  	<div>
+	{% for key,value in [0:"apple",1:"pine"] %}
+	<div>{{ key }}->{{ value }}</div>
+	{% endfor %}
+	</div>
+
+	<h3>Else</h3>
+	<div>
+	{% for i in [] %}
+	<div>INVALID</div>
+	{% else %}
+	<div>TRUE if empty</div>
+	{% endfor %}
+	</div>
+
+  	<h2> Default</h2>
+  	<a href="{{ defaultItem.href }}">{{ defaultItem['caption'] }}</a>
+  	</div>
+    <ul id="navigation">
+    {% for item in navigation %}
+      <h3>LOOP INFO</h3>
+      <div>
+      {% debug loop %}
+	  </div>
+
+      {% if loop.first %}
+         <p font="+2">
+      {% endif %}
+        <div> {{ loop.index }} </div>
+        <li><a href="{{ item.href }}">{{ item.caption }}</a></li>
+      {% if loop.first %}
+      </p>
+      {% endif %}
+      {% for num in 1 .. 2 %} {{ num }} {% for chr in 'a' .. 'c' %} {{ chr }} {% endfor %} {% endfor %}
+    {% endfor %}
+
+    </ul>
+
+    <h2>My Webpage</h2>
+    {{ a_variable }}
+    <h2>Escape Brace</h2>
+    {{ '{{' }}
+    <h2>If Test</h2>
+    {% if true %}
+    	(if true)No Problem
+    {% endif %}
+    {% if false %}
+    	(if false)If you see this text, some problem happened.
+    {% endif %}
+
+    {% if true %}
+    	(if true/then)No Problem
+    {% else %}
+    	(if true/else)If you see this text, some problem happened.
+    {% endif %}
+
+    {% if false %}
+    	(if false/then)If you see this text, some problem happened.
+    {% else %}
+    	(if false/else)No Problem.
+    {% endif %}
+
+	<h2>Calc</h2>
+	<div>1 + 2 * 3 = {{ 1 + 2 * 3 }}</div>
+	<div>true ? 1 : 2 = {{ true ? 1 : 2 }}</div>
+	<div> 1< 2,1 > 2 = {{ 1 < 2 }}, {{1 > 2}}</div>
+	<div>true and false = {{ true and false}}</div>
+	<div>true or  false = {{ true or  false}}</div>
+	<div>'abc' ~ 'def' = {{ 'abc' ~ 'def'}}</div>
+
+	<h2>SET</h2>
+	{% set test = 1 + 2 %}
+	1 + 2 = {% display test %}
+	<h2>DEBUG</h2>
+	{% debug %}
+	<h2></h2>
+	{% set vars = ['a_variable':'Rewrited','a':0] %}
+	<h3>Pass</h3>{% include 'include0.html' %}
+	<h3>Limited</h3>{% include false ? 'notfound.html' : 'include' ~ '0' ~ '.html' with vars %}
+
+	<h2>Test Filters</h2>
+	<h3>Date</h3>
+	<div>
+	{{ currentDatetime |date("m/d/y") }}
+	</div>
+	<h3>Format</h3>
+	<div>
+	{% set string = ' I like %s and %s.' %}
+	{% set foo    = 'an apple' %}
+	{# string is a format string like: I like %s and %s. #}
+	{{ string|format(foo, "bar") }}
+	{# returns I like foo and bar. (if the foo parameter equals to the foo string) #}
+	</div>
+	<h3>Cycle</h3>
+	<div>
+	{% for i in 0 .. 10 %}
+	{{ ['odd', 'even'] | cycle(i) }}
+	{% endfor %}
+	</div>
+	<h3>Assignment Capture</h3>
+	<div>
+	{% set foo %}
+	<div id="pagination">This will be captured</div>
+	{% endset %}
+	{% display foo %}
+	</div>
+	<h3>Urlencode</h3>
+	{{ "http://www.yahoo.co.jp/" | urlencode }}
+	<h3>Not supported in filter, but supported in operator.</h3>
+	{% if 1 in [1, 2, 3] %} TRUE {% else %} INVALID {% endif %}
+	<h3>Filter Statement</h3>
+	{% filter urlencode %}http://www.yahoo.co.jp/{% endfilter %}
+  </body>
+</html>

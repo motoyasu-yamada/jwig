@@ -1,0 +1,35 @@
+Welcome to Jwig
+=====================
+
+This alpha version of Jwig contains a preliminary version of the
+Java implementation of Twig().
+It has a template engine and core filter implements.
+lexer, parser, and syntax tree generator.
+You will find the executable jar files of Jwig in the 'dist' directory.
+
+Package Content
+===============
+
+Here is a description of the content of this package:
+
+* README: This file.
+* LICENSE and NOTICE: License terms.
+* build.xml Build file.
+
+* dist/: Executable jar files for distribution.
+
+* lib/build: External liblary files for build.
+* lib/dist:  External liblary files for distribution.
+
+* src/java: Source code of template-engine implementation.
+* src/test: Source code of JUnit test.
+* src/grammar: Source grammars.
+
+
+ToDo Jwig
+===============
+* Dupulicated rendered when extends templates.
+_ Write all test cases covering all sample code in Twig site.
+_ Trans Statement
+_ End Block Identification Check
+

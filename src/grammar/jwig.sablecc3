@@ -1,0 +1,390 @@
+Package com.spicysoft.jwig.sablecc;
+
+Helpers
+    all       = [0x0000 .. 0xFFFF];
+    cr        = 0x000D;
+    lf        = 0x000A;
+    tab       = 0x0009;
+    ff        = 0x000c;
+    space     = ' ';
+
+    eol       = cr lf | cr | lf;
+
+    blank     = eol | space | tab;
+
+    digit      = ['0'..'9'];
+    non_zero_digit  = ['1'..'9'];
+    hex_digit       = ['0'..'9'] | ['a'..'f'] | ['A'..'F'];
+    octal_digit     = ['0'..'7'];
+
+    decimal_numeral = '0' | non_zero_digit digit*;
+    hex_numeral     = '0' ('x' | 'X') hex_digit+;
+    octal_numeral   = '0' octal_digit+;
+    exponent_part     = ('e' | 'E') ('+' | '-')? digit+;
+    float_type_suffix = 'f' | 'F' | 'd' | 'D';
+
+
+    integer_type_suffix = 'l' | 'L';
+
+    upper_case = ['A'..'Z'];
+    lower_case = ['a'..'z'];
+
+    letter     = upper_case | lower_case;
+
+    input_character    = [all - [cr + lf]];
+    string_character0  = [input_character - [''' + '\']];
+    string_character1  = [input_character - ['"' + '\']];
+
+	not_statement  = [input_character - [['{' + '%'] + '#']] | eol;
+    not_sharp      = [input_character - '#'] | eol;
+    not_r_brace    = [input_character - '}'] | eol;
+	white_space    = (space | tab | ff | eol)*;
+
+States
+    html,statement,print;
+
+Tokens
+    {html}            html            = (not_statement* ('{' not_statement)*)+;
+    {html}            comment         = '{#' (not_sharp* ('#'+ not_r_brace)*)+ '#}';
+    {html->print}     print_start     = '{{' ;
+    {html->statement} statement_start = '{%';
+
+	{statement->html} statement_end  = '%}' white_space;
+	{statement} for_keyword       = 'for';
+	{statement} else_keyword      = 'else';
+	{statement} endfor_keyword    = 'endfor';
+	{statement} if_keyword        = 'if';
+	{statement} elseif_keyword    = 'elseif';
+	{statement} endif_keyword     = 'endif';
+    {statement} extends_keyword   = 'extends';
+    {statement} block_keyword     = 'block';
+    {statement} endblock_keyword  = 'endblock';
+    {statement} parent_keyword    = 'parent';
+    {statement} include_keyword   = 'include';
+    {statement} as_keyword        = 'as';
+    {statement} filter_keyword    = 'filter';
+    {statement} endfilter_keyword = 'endfilter';
+    {statement} set_keyword       = 'set';
+    {statement} endset_keyword    = 'endset';
+    {statement} display_keyword   = 'display';
+    {statement} debug_keyword     = 'debug';
+    {statement} trans_keyword     = 'trans';
+    {statement} endtrans_keyword  = 'endtrans';
+    {statement} with_keyword      = 'with';
+	{statement} macro_keyword     = 'macro';
+	{statement} endmacro_keyword  = 'endmacro';
+	{statement} import_keyword    = 'import';
+
+	{print,statement} in_keyword  = 'in';
+    {print->html} print_end   = '}}' white_space;
+	{print,statement} assignment_keyword = '=';
+    {print,statement} l_bracket      = '[';
+    {print,statement} r_bracket      = ']';
+    {print,statement} l_paren        = '(';
+    {print,statement} r_paren        = ')';
+    {print,statement} dot            = '.';
+    {print,statement} comma          = ',';
+    {print,statement} or_keyword     = 'or';
+    {print,statement} and_keyword    = 'and';
+    {print,statement} not_keyword    = 'not';
+    {print,statement} eq_keyword     = '==';
+    {print,statement} ne_keyword     = '!=';
+    {print,statement} lt_keyword     = '<';
+    {print,statement} gt_keyword     = '>';
+    {print,statement} ge_keyword     = '>=';
+    {print,statement} le_keyword     = '<=';
+    {print,statement} add_keyword    = '+';
+    {print,statement} sub_keyword    = '-';
+    {print,statement} mul_keyword    = '*';
+    {print,statement} pow_keyword    = '**';
+    {print,statement} div_keyword    = '/';
+    {print,statement} quotient_keyword   = '//';
+    {print,statement} mod_keyword    = '%';
+    {print,statement} concat_keyword = '~';
+    {print,statement} pipe_keyword   = '|';
+    {print,statement} tif_keyword    = '?';
+    {print,statement} collon_keyword  = ':';
+    {print,statement} range_keyword  = '..';
+    {print,statement} boolean_true_literal    = 'true';
+    {print,statement} boolean_false_literal   = 'false';
+    {print,statement} ident                   = ('_' | letter) (letter | digit | '_' )*;
+	{print,statement} string_literal          = ''' string_character0* ''' | '"' string_character1* '"';
+    {print,statement} decimal_integer_literal = decimal_numeral integer_type_suffix?;
+    {print,statement} hex_integer_literal     = hex_numeral integer_type_suffix?;
+    {print,statement} octal_integer_literal   = octal_numeral integer_type_suffix?;
+    {print,statement} none_keyword            = 'none';
+
+	{print,statement} floating_point_literal =
+        digit+ '.' digit* exponent_part? float_type_suffix? |
+               '.' digit+ exponent_part? float_type_suffix? |
+        digit+ exponent_part  float_type_suffix? |
+        digit+ exponent_part? float_type_suffix;
+	{print,statement} white_token = white_space;
+
+Ignored Tokens
+    white_token,comment;
+
+Productions
+    template =
+    	{child_template} child_template |
+    	{base_template}  base_template;
+
+    child_template = extends_statement template_elements;
+    base_template  = template_elements;
+    template_elements = template_element*;
+
+    template_element =
+        {html}                 html |
+        {print_statement}      print_statement |
+        {display_statement}    display_statement |
+        {for_block}            for_block |
+        {if_block}             if_block |
+        {debug_statement}      debug_statement |
+        {assignment_statement} assignment_statement |
+        {assignment_capture_statement} assignment_capture_statement |
+        {include_statement}    include_statement |
+        {filter_statement}     filter_statement |
+        {block_statement}      block_statement  |
+        {macro_statement}      macro_statement |
+        {import_statement}     import_statement
+        ;
+
+    print_statement   = print_start expression print_end;
+
+	display_statement = statement_start display_keyword expression statement_end;
+
+	for_block = for_start_statement template_elements for_else_block? for_end_statement;
+	for_else_block = for_else_statement template_element*;
+	for_start_statement =
+		{normal}    statement_start for_keyword ident in_keyword expression statement_end |
+		{key_value} statement_start for_keyword [key]:ident comma [value]:ident in_keyword expression statement_end;
+	for_else_statement  = statement_start else_keyword   statement_end;
+	for_end_statement   = statement_start endfor_keyword statement_end;
+
+	if_block =
+		if_statement [then_block]:template_element* [elseif_blocks]:elseif_block? else_block? endif_statement;
+	elseif_block     = elseif_statement template_element*;
+	else_block       = else_statement template_element*;
+	if_statement     = statement_start if_keyword     expression statement_end;
+	elseif_statement = statement_start elseif_keyword expression statement_end;
+	else_statement   = statement_start else_keyword  statement_end;
+	endif_statement  = statement_start endif_keyword statement_end;
+
+	debug_statement  = statement_start debug_keyword ident? statement_end;
+
+	assignment_statement = statement_start set_keyword assignment_left assignment_keyword assignment_right statement_end;
+
+	assignment_left  = assignment_var_to_set assignment_additional_left*;
+	assignment_right = expression assignment_additional_right*;
+	assignment_var_to_set       =
+		{normal}    ident;
+		// |
+		//{dot}       expression dot ident |
+		//{subscript} l_bracket expression r_bracket;
+	assignment_additional_left  = comma assignment_var_to_set;
+	assignment_additional_right = comma expression;
+
+	assignment_capture_statement = assignment_capture_start template_element* assignment_capture_end;
+	assignment_capture_start = statement_start set_keyword ident statement_end;
+	assignment_capture_end   = statement_start endset_keyword statement_end;
+
+
+	extends_statement = statement_start extends_keyword expression statement_end;
+
+	block_statement =
+	    {normal}   block_start inner_block_element* block_end |
+	    {shortcut} statement_start block_keyword ident expression statement_end;
+
+	inner_block_element = {parent} parent_statement | {template} template_element;
+
+	block_start = statement_start block_keyword ident statement_end;
+	block_end   = statement_start endblock_keyword ident? statement_end;
+
+	parent_statement = statement_start parent_keyword statement_end;
+
+	/*
+	 * @see http://www.twig-project.org/book/02-Twig-for-Template-Designers
+	 * Filter sections allow you to apply regular Twig filters on a block of
+	 * template data. Just wrap the code in the special filter section:
+	 */
+	filter_statement = filter_start template_element* filter_end;
+	filter_start = statement_start filter_keyword simple_filter_chain statement_end;
+	filter_end   = statement_start endfilter_keyword statement_end;
+
+	simple_filter_chain = filter_invoke additional_filter_invoke*;
+
+	additional_filter_invoke = pipe_keyword filter_invoke;
+
+	filter_invoke     =
+	  {noargs}   ident |
+	  {withargs} ident l_paren filter_args r_paren;
+
+	filter_args = expression additional_filter_args*;
+	additional_filter_args = comma expression;
+
+	/*
+	 * @see http://www.twig-project.org/book/02-Twig-for-Template-Designers
+	 * The include statement is useful to include a template and return
+	 * the rendered contents of that file into the current namespace:
+	 *
+	 * Included templates have access to the variables of the active context.
+	 * You can also restrict the variables passed to the template by explicitly
+	 * pass them as an array:
+	 * *** WARNING *** by Motoyasu Yamada
+	 * A map will be passed, not an array.
+	 *
+	 * When including a template created by an end user, you should consider
+	 * sandboxing it. More information in the "Twig for Developers" chapter.
+	 * The template name can be any valid Twig expression:
+	 * And if the variable evaluates to a Twig_Template object,
+	 * Twig will use it directly:
+	 */
+	include_statement = statement_start include_keyword expression include_with_args? statement_end;
+	include_with_args = with_keyword expression;
+
+	/*
+	 * Macros are comparable with functions in regular programming languages.
+	 * They are useful to put often used HTML idioms into reusable elements to not repeat yourself.
+	 */
+	macro_statement = macro_start template_elements macro_end;
+	macro_start     = statement_start macro_keyword ident l_paren macro_arglist r_paren statement_end;
+	macro_end       = statement_start endmacro_keyword statement_end;
+
+    macro_arglist   = ident additional_macro_arglist*;
+    additional_macro_arglist = comma ident;
+
+    import_statement = statement_start import_keyword expression as_keyword ident statement_end;
+
+    /**************************************************************************
+     *
+     *
+     *************************************************************************/
+	primary =
+	  {literal}    literal |
+	  {paren}      l_paren expression r_paren |
+	  {dot}        dot_access |
+	  {subscript}  subscript_access |
+	  {macro_invoke} macro_invoke |
+	  {var}        ident
+	  ;
+
+	dot_access        = primary dot ident;
+	subscript_access  = primary l_bracket expression r_bracket;
+	macro_invoke      =
+		{void}        primary dot ident l_paren r_paren |
+		{with_args}   primary dot ident l_paren macro_invoke_args r_paren;
+	macro_invoke_args = expression additional_macro_invoke_args*;
+	additional_macro_invoke_args = comma expression;
+
+	unary_expression =
+	  {primary} primary |
+	  {plus}    add_keyword unary_expression |
+	  {minus}   sub_keyword unary_expression;
+
+    not_expression =
+      {unary} unary_expression |
+      {not}   not_keyword unary_expression;
+
+	pow_expression =
+	  {unary} not_expression |
+	  {pow}   [left]:pow_expression [op]:pow_keyword [right]:not_expression;
+
+	mul_expression =
+	  {pow}   pow_expression |
+	  {mul}   [left]:mul_expression [op]:mul_keyword  [right]:pow_expression |
+	  {div}   [left]:mul_expression [op]:div_keyword  [right]:pow_expression |
+	  {mod}   [left]:mul_expression [op]:mod_keyword  [right]:pow_expression |
+	  {quotient}  [left]:mul_expression [op]:quotient_keyword [right]:pow_expression;
+
+	add_expression =
+	  {mul}    mul_expression |
+	  {add}    [left]:add_expression [op]:add_keyword [right]:mul_expression |
+	  {sub}    [left]:add_expression [op]:sub_keyword [right]:mul_expression |
+	  {concat} [left]:add_expression [op]:concat_keyword [right]:mul_expression;
+
+	cmp_expression =
+	  {add}     add_expression |
+	  {lt}      [left]:cmp_expression  [op]:lt_keyword  [right]:add_expression |
+	  {gt}      [left]:cmp_expression  [op]:gt_keyword  [right]:add_expression |
+	  {le}      [left]:cmp_expression  [op]:le_keyword  [right]:add_expression |
+	  {ge}      [left]:cmp_expression  [op]:ge_keyword  [right]:add_expression |
+      {in}      [value]:cmp_expression [op]:in_keyword  [array]:add_expression;
+
+	eq_expression  =
+	  {cmp} cmp_expression |
+	  {eq}  [left]:eq_expression [op]:eq_keyword [right]:cmp_expression |
+	  {ne}  [left]:eq_expression [op]:ne_keyword [right]:cmp_expression ;
+
+	and_expression =
+	  {eq}  eq_expression |
+	  {and} [left]:and_expression [op]:and_keyword [right]:eq_expression;
+
+	or_expression =
+	  {eq} and_expression |
+	  {or} [left]:or_expression [op]:or_keyword [right]:and_expression;
+
+	tenary_expression =
+	  {or}     or_expression |
+	  {tenary} [condition]:or_expression tif_keyword [then]:expression collon_keyword [else]:tenary_expression ;
+
+	range_expression  =
+		{tenary} tenary_expression |
+		{range}   [from]:tenary_expression  [op]:range_keyword [to]:tenary_expression;
+//		{between} [min]:tenary_expression   [op1]:lt_keyword [value]:tenary_expression [op2]:lt_keyword [max]:tenary_expression;
+
+	pipe_expression = expression pipe_keyword filter_invoke;
+
+	sub_expression  = {range_expression} range_expression | {pipe_expression} pipe_expression;
+
+	expression = sub_expression;
+
+	left_hand_side =
+	    {ident}            ident |
+	    {dot_access}       dot_access |
+	    {subscript_access} subscript_access;
+
+	literal =
+		{string}  string_literal  |
+		{boolean} boolean_literal |
+		{integer} integer_literal |
+		{double}  floating_point_literal |
+		{arrays}  array_literal  |
+		{none}    none_keyword;
+
+	boolean_literal =
+	    {true}  boolean_true_literal |
+	    {false} boolean_false_literal;
+
+	integer_literal =
+	    {decimal} decimal_integer_literal |
+	    {hex} hex_integer_literal |
+	    {octal} octal_integer_literal;
+
+	/*
+	 * @see http://www.twig-project.org/book/02-Twig-for-Template-Designers
+	 *
+	 * Arrays are defined by a sequence of expressions separated by a comma (,)
+	 * and wrapped with squared brackets ([]). As an array element can be any
+	 * valid expression, arrays can be nested.
+	 * Like PHP, arrays can also have named items (hashes) like
+	 * ['foo': 'foo', 'bar': 'bar'].
+	 * You can even mix and match both syntaxes: ['foo': 'foo', 'bar'].
+	 */
+	array_literal =
+	    {regular}  l_bracket array_literal_elements r_bracket |
+	    {empty} l_bracket r_bracket;
+
+	array_literal_elements = array_literal_element additional_array_literal_element*;
+	additional_array_literal_element  = comma array_literal_element;
+	array_literal_element  =
+		{regular}      [key]:expression collon_keyword [value]:expression |
+		{abbreviation} [value]:expression;
+
+/**********************************************************
+ UNSUPPORTED COMMENT
+
+
+trans_statement =
+    {normal} statement_start trans_keyword expression statement_end |
+    {block}  statement_start trans_keyword statement_end template_element* statement_start endtrans_keyword statement_end;
+*/

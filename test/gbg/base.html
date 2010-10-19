@@ -1,0 +1,22 @@
+<!-- base.html => --><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head><!-- <== base.html -->
+  {% block head %}
+  	<!-- base.html => -->
+    <link rel="stylesheet" href="style.css" />
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    <!-- <== base.html -->
+  {% endblock %}
+<!-- base.html => -->
+</head>
+<body>
+  <div id="content"><!-- <== base.html -->
+  {% block content %}<!-- base.html => --><!-- <== base.html -->{% endblock %}<!-- base.html => --></div>
+  <div id="footer"><!-- <== base.html -->
+    {% block footer %}
+      <!-- base.html => -->&copy; Copyright 2009 by <a href="http://domain.invalid/">you</a><!-- <== base.html -->.
+    {% endblock %}<!-- base.html => -->
+  </div>
+</body>
+</html>
+<!-- <== base.html -->
